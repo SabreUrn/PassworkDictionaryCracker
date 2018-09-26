@@ -9,33 +9,43 @@ using System.Threading.Tasks;
 namespace CrackerClient {
 	class Program {
 		static void Main(string[] args) {
-			Console.Write("Enter IP: ");
-			string ip = Console.ReadLine();
-			Console.Write("Enter port: ");
-			string port = Console.ReadLine();
-			TcpClient clientSocket = WaitForServer(ip, port);
-			Console.WriteLine("Client ready.");
+			Client client = Client.Instance;
 
-			NetworkStream ns = clientSocket.GetStream();
-			StreamReader sr = new StreamReader(ns);
-			StreamWriter sw = new StreamWriter(ns) { AutoFlush = true };
+			//protocol:
+			//1st line of server message is cracking portion size
+			//2nd line is cracking portion with each pair separated by space
 
-			string message = "";
-			string serverAnswer = "";
-
-			while(true) {
-				message = Console.ReadLine();
-				try {
-					sw.WriteLine(message);
-					serverAnswer = sr.ReadLine();
-				} catch(IOException) {
-					Console.WriteLine("Server connection closed.");
-					Console.WriteLine("Press any key to exit.");
-					Console.ReadKey();
-					return;
-				}
-				Console.WriteLine($"Server: {serverAnswer}");
+			// Get portion size
+			string portionSize = client.ReadLine();
+			bool portionSizeIsNum = Int32.TryParse(portionSize, out int portionSizeInt);
+			if(!portionSizeIsNum) {
+				throw new Exception($"Portion size is not int. Portion size: {portionSize}");
 			}
+
+			// Get portion
+			List<string> portion = client.ReadLine().Split(' ').ToList<string>();
+
+			// Crack list
+			client.WriteLine(Crack.RunCracking(portion));
+
+			Console.WriteLine("Done with list. Press any key to exit.");
+			Console.ReadKey();
+
+			//string message = "";
+			//string serverMessage = "";
+			//while(true) {
+			//	message = Console.ReadLine();
+			//	try {
+			//		serverMessage = sr.ReadLine();
+
+			//	} catch(IOException) {
+			//		Console.WriteLine("Server connection closed.");
+			//		Console.WriteLine("Press any key to exit.");
+			//		Console.ReadKey();
+			//		return;
+			//	}
+			//	Console.WriteLine($"Server: {serverMessage}");
+			//}
 		}
 
 		private static TcpClient WaitForServer(string ip, string port) {

@@ -38,19 +38,19 @@ namespace CrackerServer {
 		public void RunClient() {
 			Console.WriteLine($"Client {_name} connected.");
 			while(true) {
-				if(_readMessage == null) {
-					return;
-				}
-				_readMessage = ReadMessage();
-				while(_readMessage != null) {
-					Console.WriteLine($"Client {_name}: {_readMessage}");
-					WriteMessage(_readMessage);
-					_readMessage = ReadMessage();
-				}
+				//if(_readMessage == null) {
+				//	return;
+				//}
+				//_readMessage = ReadMessage();
+				//while(_readMessage != null) {
+				//	Console.WriteLine($"Client {_name}: {_readMessage}");
+				//	WriteMessage(_readMessage);
+				//	_readMessage = ReadMessage();
+				//}
 			}
 		}
 
-		private string ReadMessage() {
+		public string ReadMessage() {
 			try {
 				return _sr.ReadLine();
 			} catch(IOException) {
@@ -60,10 +60,10 @@ namespace CrackerServer {
 			}
 		}
 
-		private void WriteMessage(string readMessage) {
-			string writeMessage = "";
-			writeMessage = readMessage.ToUpper();
-			_sw.WriteLine(writeMessage);
+		public void WriteMessage(string message) {
+			//string writeMessage = "";
+			//writeMessage = readMessage.ToUpper();
+			_sw.WriteLine(message);
 		}
 
 		private void Close() {

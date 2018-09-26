@@ -12,6 +12,10 @@ namespace CrackerServer {
 			_list.Add(c);
 		}
 
+		public static Client GetByIndex(int index) {
+			return _list[index];
+		}
+
 		public static void RemoveByClient(Client c) {
 			_list.Remove(c);
 		}

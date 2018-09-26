@@ -21,11 +21,18 @@ namespace CrackerServer {
 			Console.ReadKey();
 			AcceptClients.Accepting = false;
 
-			//get username-password list file location
-			string[] lines = System.IO.File.ReadAllLines(@"passwords.txt");
-			foreach(string line in lines) {
-				Console.WriteLine(line);
+			//get username-password list file contents
+			string[] lines = System.IO.File.ReadAllLines("passwords.txt");
+			//Console.WriteLine(String.Join(" ", lines));
+
+			Client client = ClientList.GetByIndex(0);
+			client.WriteMessage(lines.Length.ToString());
+			client.WriteMessage(String.Join(" ", lines));
+			string[] returnMessage = client.ReadMessage().Split('\\');
+			for(int i=0,L=returnMessage.Length; i<L; i++) {
+				Console.WriteLine(returnMessage[i]);
 			}
+			Console.WriteLine("Passwords read.");
 			Console.ReadKey();
 		}
 	}
