@@ -23,7 +23,6 @@ namespace CrackerServer {
 
 			//get username-password list file contents
 			string[] userInfos = System.IO.File.ReadAllLines("passwords.txt");
-			//Console.WriteLine(String.Join(" ", lines));
 
 			//divide work to clients
 			int clientCount = ClientList.Count;

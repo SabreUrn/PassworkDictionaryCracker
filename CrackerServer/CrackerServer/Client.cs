@@ -14,7 +14,6 @@ namespace CrackerServer {
 		private StreamWriter _sw;
 
 		private string _name;
-		private string _readMessage;
 
 		public Client(TcpClient client, string name) {
 			_client = client;
@@ -22,8 +21,8 @@ namespace CrackerServer {
 			_sr = new StreamReader(_ns);
 			_sw = new StreamWriter(_ns) { AutoFlush = true };
 			_name = name;
-			_readMessage = "";
 
+			Console.WriteLine($"Client {_name} connected.");
 			Task.Factory.StartNew(() => RunClient());
 		}
 
@@ -36,17 +35,7 @@ namespace CrackerServer {
 		}
 
 		public void RunClient() {
-			Console.WriteLine($"Client {_name} connected.");
 			while(true) {
-				//if(_readMessage == null) {
-				//	return;
-				//}
-				//_readMessage = ReadMessage();
-				//while(_readMessage != null) {
-				//	Console.WriteLine($"Client {_name}: {_readMessage}");
-				//	WriteMessage(_readMessage);
-				//	_readMessage = ReadMessage();
-				//}
 			}
 		}
 
@@ -69,8 +58,6 @@ namespace CrackerServer {
 		}
 
 		public void WriteMessage(string message) {
-			//string writeMessage = "";
-			//writeMessage = readMessage.ToUpper();
 			_sw.WriteLine(message);
 		}
 
@@ -84,7 +71,6 @@ namespace CrackerServer {
 				WriteMessage(message[i]);
 			}
 			WriteMessage("PWLISTEND");
-			//WriteMessage(String.Join(" ", message));
 		}
 
 		private void Close() {

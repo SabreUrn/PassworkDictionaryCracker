@@ -37,47 +37,6 @@ namespace CrackerClient {
 
 			Console.WriteLine("Done with list. Press any key to exit.");
 			Console.ReadKey();
-
-			//string message = "";
-			//string serverMessage = "";
-			//while(true) {
-			//	message = Console.ReadLine();
-			//	try {
-			//		serverMessage = sr.ReadLine();
-
-			//	} catch(IOException) {
-			//		Console.WriteLine("Server connection closed.");
-			//		Console.WriteLine("Press any key to exit.");
-			//		Console.ReadKey();
-			//		return;
-			//	}
-			//	Console.WriteLine($"Server: {serverMessage}");
-			//}
-		}
-
-		private static TcpClient WaitForServer(string ip, string port) {
-			TcpClient clientSocket = new TcpClient();
-			bool serverFound = false;
-
-			bool portIsInt = Int32.TryParse(port, out int portNumber);
-			while(!portIsInt) {
-				Console.WriteLine("Unable to parse port.");
-				Console.Write("Enter port: ");
-				port = Console.ReadLine();
-				portIsInt = Int32.TryParse(port, out portNumber);
-			}
-
-			while(!serverFound) {
-				try {
-					clientSocket = new TcpClient(ip, portNumber);
-					serverFound = true;
-				} catch(SocketException) {
-					Console.WriteLine("Cannot find server. Check if server is running.");
-					Console.WriteLine("Retrying in 5 seconds.");
-					System.Threading.Thread.Sleep(5000);
-				}
-			}
-			return clientSocket;
 		}
 	}
 }
