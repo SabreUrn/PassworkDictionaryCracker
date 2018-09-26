@@ -12,7 +12,7 @@ namespace CrackerServer {
 		public static void AcceptClient(TcpListener serverSocket) {
 			while(Accepting) {
 				//accept new Client and add to static ClientList
-				Client client = new Client(serverSocket.AcceptTcpClient(), ClientList.Count().ToString());
+				Client client = new Client(serverSocket.AcceptTcpClient(), ClientList.Count.ToString());
 				ClientList.Add(client);
 			}
 		}

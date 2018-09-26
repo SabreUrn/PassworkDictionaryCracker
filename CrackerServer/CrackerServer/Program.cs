@@ -18,22 +18,45 @@ namespace CrackerServer {
 			Console.WriteLine("Waiting for clients.");
 			//stop accepting when all connected
 			Console.WriteLine("Press any key to stop accepting clients and begin cracking password list.");
-			Console.ReadKey();
+			Console.ReadKey(true);
 			AcceptClients.Accepting = false;
 
 			//get username-password list file contents
-			string[] lines = System.IO.File.ReadAllLines("passwords.txt");
+			string[] userInfos = System.IO.File.ReadAllLines("passwords.txt");
 			//Console.WriteLine(String.Join(" ", lines));
 
-			Client client = ClientList.GetByIndex(0);
-			client.WriteMessage(lines.Length.ToString());
-			client.WriteMessage(String.Join(" ", lines));
-			string[] returnMessage = client.ReadMessage().Split('\\');
-			for(int i=0,L=returnMessage.Length; i<L; i++) {
-				Console.WriteLine(returnMessage[i]);
+			//divide work to clients
+			int clientCount = ClientList.Count;
+			int currentIndex = 0;
+			List<Task> clientReadTasks = new List<Task>();
+			for (int currentClientIndex = 1; currentClientIndex <= clientCount; currentClientIndex++) {
+				int newSize = userInfos.Length / clientCount;
+				string[] smallerArray = new string[newSize];
+				for (int i = 0; i < newSize; i++) {
+					Console.WriteLine(userInfos[currentIndex]);
+					smallerArray[i] = userInfos[currentIndex];
+					currentIndex++;
+				}
+
+				Client client = ClientList.GetByIndex(currentClientIndex - 1);
+				client.WriteEncryptedPasswords(smallerArray);
+
+				Task task = Task.Factory.StartNew(() => client.ReadCrackedPasswords());
+				clientReadTasks.Add(task);
+				Console.WriteLine("did it");
 			}
-			Console.WriteLine("Passwords read.");
-			Console.ReadKey();
+			Task[] taskArray = clientReadTasks.ToArray();
+			Task.Factory.ContinueWhenAll(taskArray, FinishWork);
+
+			while(true) { } //don't exit until told to in FinishWork()
+		}
+
+		static void FinishWork(Task[] tasks) {
+			if(tasks.All(t => t.Status == TaskStatus.RanToCompletion)) {
+				Console.WriteLine("Passwords read.");
+				Console.ReadKey();
+				Environment.Exit(0);
+			}
 		}
 	}
 }

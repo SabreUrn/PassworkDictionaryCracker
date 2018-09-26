@@ -20,8 +20,8 @@ namespace CrackerServer {
 			_list.Remove(c);
 		}
 
-		public static int Count() {
-			return _list.Count;
+		public static int Count {
+			get { return _list.Count; }
 		}
 	}
 }

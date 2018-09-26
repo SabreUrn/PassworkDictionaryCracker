@@ -14,6 +14,7 @@ namespace CrackerClient {
 			//protocol:
 			//1st line of server message is cracking portion size
 			//2nd line is cracking portion with each pair separated by space
+			//last line is "PWLISTEND" to tell the client to start decoding
 
 			// Get portion size
 			string portionSize = client.ReadLine();
@@ -21,9 +22,15 @@ namespace CrackerClient {
 			if(!portionSizeIsNum) {
 				throw new Exception($"Portion size is not int. Portion size: {portionSize}");
 			}
+			Console.WriteLine($"Portion size: {portionSize}");
 
-			// Get portion
-			List<string> portion = client.ReadLine().Split(' ').ToList<string>();
+			// Get portions until "PWLISTEND" received
+			List<string> portion = new List<string>();
+			string nextLine = client.ReadLine();
+			while(nextLine != "PWLISTEND") {
+				portion.Add(nextLine);
+				nextLine = client.ReadLine();
+			}
 
 			// Crack list
 			client.WriteLine(Crack.RunCracking(portion));

@@ -60,10 +60,31 @@ namespace CrackerServer {
 			}
 		}
 
+		public bool ReadCrackedPasswords() {
+			string[] returnMessage = this.ReadMessage().Split('\\');
+			for (int i=0,L=returnMessage.Length; i<L; i++) {
+				Console.WriteLine(returnMessage[i]);
+			}
+			return true;
+		}
+
 		public void WriteMessage(string message) {
 			//string writeMessage = "";
 			//writeMessage = readMessage.ToUpper();
 			_sw.WriteLine(message);
+		}
+
+		public void WriteEncryptedPasswords(string[] message) {
+			//protocol:
+			//1st line of server message is cracking portion size
+			//2nd line is cracking portion with each pair separated by space
+			//last line is "PWLISTEND" to tell the client to start decoding
+			WriteMessage(message.Length.ToString());
+			for(int i=0,L=message.Length; i<L; i++) {
+				WriteMessage(message[i]);
+			}
+			WriteMessage("PWLISTEND");
+			//WriteMessage(String.Join(" ", message));
 		}
 
 		private void Close() {
