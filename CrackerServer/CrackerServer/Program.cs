@@ -13,11 +13,20 @@ namespace CrackerServer {
 			serverSocket.Start();
 			Console.WriteLine("Server started.");
 
-			while(true) {
-				//accept new Client and add to static ClientList
-				Client client = new Client(serverSocket.AcceptTcpClient(), ClientList.Count().ToString());
-				ClientList.Add(client);
+			//accept clients while accepting clients
+			Task.Factory.StartNew(() => AcceptClients.AcceptClient(serverSocket));
+			Console.WriteLine("Waiting for clients.");
+			//stop accepting when all connected
+			Console.WriteLine("Press any key to stop accepting clients and begin cracking password list.");
+			Console.ReadKey();
+			AcceptClients.Accepting = false;
+
+			//get username-password list file location
+			string[] lines = System.IO.File.ReadAllLines(@"passwords.txt");
+			foreach(string line in lines) {
+				Console.WriteLine(line);
 			}
+			Console.ReadKey();
 		}
 	}
 }
