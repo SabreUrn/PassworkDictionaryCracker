@@ -7,16 +7,26 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CrackerClient {
+	/// <summary>
+	/// Singleton client class for maintaining the client, its status, and its connection.
+	/// </summary>
 	public class Client {
 		private static Client _instance;
 		private TcpClient _clientSocket;
 		private NetworkStream _ns;
 		private StreamReader _sr;
 		private StreamWriter _sw;
-
 		private string _ip;
 		private int _port;
 
+		/// <summary>
+		/// The current chunk of dictionary words to test with.
+		/// </summary>
+		public List<string> Chunk { get; set; }
+
+		/// <summary>
+		/// Instantiates the client.
+		/// </summary>
 		private Client() {
 			GetIpAndPort();
 			_clientSocket = WaitForServer();
@@ -26,6 +36,9 @@ namespace CrackerClient {
 			Console.WriteLine("Client ready.");
 		}
 
+		/// <summary>
+		/// Singleton instance getter.
+		/// </summary>
 		public static Client Instance {
 			get {
 				if (_instance == null) {
@@ -35,15 +48,25 @@ namespace CrackerClient {
 			}
 		}
 
+		/// <summary>
+		/// Reads a single-line message from the server.
+		/// </summary>
+		/// <returns>The read message.</returns>
 		public string ReadLine() {
 			return _sr.ReadLine();
 		}
 
+		/// <summary>
+		/// Writes a single-line message to the server.
+		/// </summary>
+		/// <param name="line">The message to write.</param>
 		public void WriteLine(string line) {
 			_sw.WriteLine(line);
 		}
 
-
+		/// <summary>
+		/// Traps the user in a loop until IP and proper port are provided.
+		/// </summary>
 		private void GetIpAndPort() {
 			Console.Write("Enter IP: ");
 			_ip = Console.ReadLine();
@@ -58,6 +81,10 @@ namespace CrackerClient {
 			}
 		}
 
+		/// <summary>
+		/// Holds client until server connection can be found.
+		/// </summary>
+		/// <returns>The server TCP socket.</returns>
 		private TcpClient WaitForServer() {
 			TcpClient clientSocket = new TcpClient();
 			bool serverFound = false;

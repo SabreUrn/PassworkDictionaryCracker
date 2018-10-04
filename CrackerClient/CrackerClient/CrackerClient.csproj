@@ -51,6 +51,7 @@
     <Compile Include="Model\UserInfoClearText.cs" />
     <Compile Include="Utils\CheckVariations.cs" />
     <Compile Include="Utils\PasswordHandler.cs" />
+    <Compile Include="Utils\ServerMessaging.cs" />
     <Compile Include="Utils\StringUtils.cs" />
   </ItemGroup>
   <ItemGroup>
