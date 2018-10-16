@@ -1,0 +1,33 @@
+Contain within this file is the protocol for client-server communication for a distributed password dictionary cracking software.
+The architecture of the client and server programs follow strict master-slave roles, respectively. The client must always request an exchange from the server - never the other way around.
+
+--------------------------------------------------
+--------------------------------------------------
+Send cracked username-password pairs for a given chunk to the server
+
+Always 2 messages
+	1.	Exact message client->server: "CHUNKRES" (this tells the server to read cracked user info)
+	2.	Single-line message server->client: user-friendly cracked username-password pairs separated by '\'; for example: "John: 123\\Alice: qwerty\\Bob: asdfgh"
+
+--------------------------------------------------
+--------------------------------------------------
+Send all encrypted UserInfo pairs to a client
+
+Variable number of messages
+	1.		Exact message client->server: "PWLISTREQ" (this tells the server to send the encrypted user info)
+	2.		Exact message server->client: "PWLISTRES" (this tells the client it can correctly start reading encrypted user info)
+	n.		Encrypted username-password pair server->client
+	n+1.	Exact message server->client: "PWLISTRESEND" (this tells the client to stop reading encrypted user info)
+
+--------------------------------------------------
+--------------------------------------------------
+Send one chunk of dictionary words to a client
+
+Variable number of messages, depending on global cracking progress
+	1. Exact message client->server: "CHUNKSIZEREQ"
+	If there's a chunk left to send (i.e. the server hasn't already sent all chunks):
+		2.		Exact message server->client: "CHUNKSIZERES"
+		n.		A word in the chunk until the entire chunk has been sent
+		n+1.	Exact message server->client: "CHUNKSIZERESEND"
+	Else (i.e. there are no chunks left to send):
+		2.		Exact message server->client: "NOCHUNK"
