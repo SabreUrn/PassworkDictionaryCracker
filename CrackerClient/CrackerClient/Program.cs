@@ -9,8 +9,6 @@ using System.Threading.Tasks;
 namespace CrackerClient {
 	class Program {
 		static void Main(string[] args) {
-			Client client = Client.Instance;
-
 			/* Crack list */
 			Crack.RunCracking();
 

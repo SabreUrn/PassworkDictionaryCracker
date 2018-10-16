@@ -94,20 +94,6 @@ namespace CrackerServer {
 		}
 
 		/// <summary>
-		/// Reads a single-line message from client and prints out user-friendly username-passwords pairs.
-		/// </summary>
-		public void ReadCrackedPasswords() {
-			//protocol:
-			//1st msg: "CHUNKRES"
-			//2nd msg: results in 1 string separated by \\
-			string message = ReadMessage();
-			string[] messageSplit = message.Split('\\');
-			for (int i = 0, L = messageSplit.Length; i < L; i++) {
-				Console.WriteLine(messageSplit[i]);
-			}
-		}
-
-		/// <summary>
 		/// Writes a single-line message to the client through the StreamWriter.
 		/// </summary>
 		/// <param name="message">Message to write to the client.</param>
@@ -116,14 +102,28 @@ namespace CrackerServer {
 		}
 
 		/// <summary>
+		/// Reads a single-line message from client and prints out user-friendly username-passwords pairs.
+		/// </summary>
+		public void ReadCrackedPasswords() {
+			//protocol:
+			//1st msg: "CHUNKRES"
+			//2nd msg: results in 1 string separated by \
+			string message = ReadMessage();
+			string[] messageSplit = message.Split('\\');
+			for (int i = 0, L = messageSplit.Length; i < L; i++) {
+				Console.WriteLine(messageSplit[i]);
+			}
+		}
+
+		/// <summary>
 		/// Writes all encrypted username-password pairs to the client.
 		/// </summary>
 		/// <param name="message">Array of username + SHA1-encrypted password pairs.</param>
 		public void WriteEncryptedPasswords(string[] message) {
 			//protocol:
-			//1st msg: "PWLIST"
+			//1st msg: "PWLISTRES"
 			//2nd to nth msg: user-encrpw pair
-			//n+1th msg: "PWLISTEND"
+			//n+1th msg: "PWLISTRESEND"
 			WriteMessage("PWLISTRES");
 			for(int i=0,L=message.Length; i<L; i++) {
 				WriteMessage(message[i]);
@@ -138,19 +138,23 @@ namespace CrackerServer {
 			List<string> chunk = new List<string>();
 			int currentChunkIndex;
 			bool overrideIndex = false;
-			if(SharedStatus.ChunkIndexOverrides.Count > 0) {
-				//protocol if chunks left:
-				//1st msg: "CHUNKSIZE"
-				//2nd to nth msg: each word in the chunk
-				//n+1th msg: "CHUNKSIZERESEND"
-				currentChunkIndex = SharedStatus.ChunkIndexOverrides[0];
-				SharedStatus.ChunkIndexOverrides.RemoveAt(0);
+			//protocol if chunks left:
+			//1st msg: "CHUNKSIZEREQ"
+			//2nd to nth msg: each word in the chunk
+			//n+1th msg: "CHUNKSIZERESEND"
+
+			//protocol if no chunks left:
+			//1st msg: "NOCHUNK"
+
+			if (SharedStatus.ChunkIndexOverrides.Count > 0) { //if we have chunks we need overridden (because a client closed before sending its response),
+				currentChunkIndex = SharedStatus.ChunkIndexOverrides[0]; //set our current chunk index to the first element in our overrides list
+				SharedStatus.ChunkIndexOverrides.RemoveAt(0); //remove it so we don't assign a client to the chunk twice at once
 				overrideIndex = true;
 			} else {
-				currentChunkIndex = SharedStatus.CurrentChunkIndex;
+				currentChunkIndex = SharedStatus.CurrentChunkIndex; //otherwise, we're just using the regular index
 			}
-			if (currentChunkIndex < SharedStatus.DictionaryChunks.Count) {
-				chunk = SharedStatus.DictionaryChunks[SharedStatus.CurrentChunkIndex];
+			if (currentChunkIndex < SharedStatus.DictionaryChunks.Count) { //if true, we haven't sent all chunks yet
+				chunk = SharedStatus.DictionaryChunks[currentChunkIndex]; //grab chunk at current index
 				_lastAccessedChunkIndex = currentChunkIndex;
 				WriteMessage("CHUNKSIZERES");
 				foreach (string line in chunk) {
@@ -159,8 +163,6 @@ namespace CrackerServer {
 				WriteMessage("CHUNKSIZERESEND");
 				if(!overrideIndex) SharedStatus.CurrentChunkIndex++;
 			} else {
-				//protocol if no chunks left:
-				//1st msg: "NOCHUNK"
 				WriteMessage("NOCHUNK");
 			}
 		}
@@ -177,7 +179,9 @@ namespace CrackerServer {
 			_ns.Dispose();
 			_client.Close();
 			_client.Dispose();
-			if(!SharedStatus.ChunkIndexOverrides.Contains(_lastAccessedChunkIndex)) SharedStatus.ChunkIndexOverrides.Add(_lastAccessedChunkIndex);
+			if (!SharedStatus.ChunkIndexOverrides.Contains(_lastAccessedChunkIndex)) {
+				SharedStatus.ChunkIndexOverrides.Add(_lastAccessedChunkIndex); //add the chunk this was working on but didn't return to our overrides so next client can do it
+			}
 			ClientList.RemoveByClient(this);
 		}
 	}

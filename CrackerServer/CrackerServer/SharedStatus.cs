@@ -14,7 +14,7 @@ namespace CrackerServer {
 		/// </summary>
 		public static string[] UserInfos;
 		/// <summary>
-		/// The current index of the dictionary chunks list.
+		/// The current index of the dictionary chunks list (for keeping track of last sent chunk and global cracking progress).
 		/// </summary>
 		public static volatile int CurrentChunkIndex = 0;
 		/// <summary>

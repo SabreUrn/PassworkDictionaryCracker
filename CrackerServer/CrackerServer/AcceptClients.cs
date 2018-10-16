@@ -16,7 +16,9 @@ namespace CrackerServer {
 		/// <param name="serverSocket">The socket to listen to.</param>
 		public static void AcceptClient(TcpListener serverSocket) {
 			//accept new client
-			Client client = new Client(serverSocket.AcceptTcpClient(), ClientList.Count.ToString());
+			while(true) {
+				Client client = new Client(serverSocket.AcceptTcpClient(), ClientList.Count.ToString());
+			}
 		}
 	}
 }
