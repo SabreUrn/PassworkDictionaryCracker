@@ -27,12 +27,14 @@ namespace CrackerClient {
 		/// <summary>
 		/// Instantiates the client.
 		/// </summary>
-		private Client() {
+		private Client() { }
+
+		public void Initialise() {
 			GetIpAndPort();
 			_clientSocket = WaitForServer();
-			NetworkStream ns = _clientSocket.GetStream();
-			_sr = new StreamReader(ns);
-			_sw = new StreamWriter(ns) { AutoFlush = true };
+			_ns = _clientSocket.GetStream();
+			_sr = new StreamReader(_ns);
+			_sw = new StreamWriter(_ns) { AutoFlush = true };
 			Console.WriteLine("Client ready.");
 		}
 
