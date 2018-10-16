@@ -23,41 +23,68 @@ namespace CrackerClient.Utils {
 			List<UserInfoClearText> result = new List<UserInfoClearText>();
 
 			//check normal
-			result.AddRange(CheckWord(userInfos, dictionaryEntry));
+			IEnumerable<UserInfoClearText> partialResultNormal = CheckWord(userInfos, dictionaryEntry);
+			result.AddRange(partialResultNormal);
+			userInfos = RemoveMatches(partialResultNormal, userInfos);
 
 			//check with capitalisation variations
-			result.AddRange(CheckWordCapitalised(userInfos, dictionaryEntry));
+			IEnumerable<UserInfoClearText> partialResultCapitalised = CheckWordCapitalised(userInfos, dictionaryEntry);
+			result.AddRange(partialResultCapitalised);
+			userInfos = RemoveMatches(partialResultCapitalised, userInfos);
 
 			//check reversed
-			result.AddRange(CheckWordReversed(userInfos, dictionaryEntry));
+			IEnumerable<UserInfoClearText> partialResultReversed = CheckWordReversed(userInfos, dictionaryEntry);
+			result.AddRange(partialResultReversed);
+			userInfos = RemoveMatches(partialResultReversed, userInfos);
 
 			//check reversed with capitalisation variants
-			result.AddRange(CheckWordCapitalisedReversed(userInfos, dictionaryEntry));
+			IEnumerable<UserInfoClearText> partialResultCapitalisedReversed = CheckWordCapitalisedReversed(userInfos, dictionaryEntry);
+			result.AddRange(partialResultCapitalisedReversed);
+			userInfos = RemoveMatches(partialResultNormal, userInfos);
 
 			//check with number in front OR at end
 			for (int firstDigit = 0; firstDigit < 100; firstDigit++) {
 				//check normal
-				result.AddRange(CheckWord(userInfos, dictionaryEntry, firstDigit));
+				IEnumerable<UserInfoClearText> partialResultNormalNumbersAtEither = CheckWord(userInfos, dictionaryEntry, firstDigit);
+				result.AddRange(partialResultNormalNumbersAtEither);
+				userInfos = RemoveMatches(partialResultNormalNumbersAtEither, userInfos);
 
 				//check with capitalisation variations
-				result.AddRange(CheckWordCapitalised(userInfos, dictionaryEntry, firstDigit));
+				IEnumerable<UserInfoClearText> partialResultCapitalisedNumbersAtEither = CheckWordCapitalised(userInfos, dictionaryEntry, firstDigit);
+				result.AddRange(partialResultCapitalisedNumbersAtEither);
+				userInfos = RemoveMatches(partialResultCapitalisedNumbersAtEither, userInfos);
 
 				//check reversed
-				result.AddRange(CheckWordReversed(userInfos, dictionaryEntry, firstDigit));
+				IEnumerable<UserInfoClearText> partialResultReversedNumbersAtEither = CheckWordReversed(userInfos, dictionaryEntry, firstDigit);
+				result.AddRange(partialResultReversedNumbersAtEither);
+				userInfos = RemoveMatches(partialResultReversedNumbersAtEither, userInfos);
+
+				//check reversed with capitalisation variations
+				IEnumerable<UserInfoClearText> partialResultCapitalisedReversedNumbersAtEither = CheckWordCapitalisedReversed(userInfos, dictionaryEntry, firstDigit);
+				result.AddRange(partialResultCapitalisedReversedNumbersAtEither);
+				userInfos = RemoveMatches(partialResultCapitalisedReversedNumbersAtEither, userInfos);
 
 				//check with number in front AND at end
 				for (int secondDigit = 0; secondDigit < 100; secondDigit++) {
 					//check normal
-					result.AddRange(CheckWord(userInfos, dictionaryEntry, firstDigit, secondDigit));
+					IEnumerable<UserInfoClearText> partialResultNormalNumbersAtBoth = CheckWord(userInfos, dictionaryEntry, firstDigit, secondDigit);
+					result.AddRange(partialResultNormalNumbersAtBoth);
+					userInfos = RemoveMatches(partialResultNormalNumbersAtBoth, userInfos);
 
 					//check with capitalisation variations
-					result.AddRange(CheckWordCapitalised(userInfos, dictionaryEntry, firstDigit, secondDigit));
+					IEnumerable<UserInfoClearText> partialResultCapitalisedNumbersAtBoth = CheckWordCapitalised(userInfos, dictionaryEntry, firstDigit, secondDigit);
+					result.AddRange(partialResultCapitalisedNumbersAtBoth);
+					userInfos = RemoveMatches(partialResultCapitalisedNumbersAtBoth, userInfos);
 
 					//check reversed
-					result.AddRange(CheckWordReversed(userInfos, dictionaryEntry, firstDigit, secondDigit));
+					IEnumerable<UserInfoClearText> partialResultReversedNumbersAtBoth = CheckWordReversed(userInfos, dictionaryEntry, firstDigit, secondDigit);
+					result.AddRange(partialResultReversedNumbersAtBoth);
+					userInfos = RemoveMatches(partialResultReversedNumbersAtBoth, userInfos);
 
 					//check reversed with capitalisation variations
-					result.AddRange(CheckWordCapitalisedReversed(userInfos, dictionaryEntry, firstDigit, secondDigit));
+					IEnumerable<UserInfoClearText> partialResultCapitalisedReversedNumbersAtBoth = CheckWordCapitalisedReversed(userInfos, dictionaryEntry, firstDigit, secondDigit);
+					result.AddRange(partialResultCapitalisedReversedNumbersAtBoth);
+					userInfos = RemoveMatches(partialResultCapitalisedReversedNumbersAtBoth, userInfos);
 				}
 			}
 
@@ -106,6 +133,13 @@ namespace CrackerClient.Utils {
 				result.AddRange(CheckSingleWord(userInfos, firstDigitString + wordCapitalisedReversed + secondDigitString));
 			}
 			return result;
+		}
+
+		private static List<UserInfo> RemoveMatches(IEnumerable<UserInfoClearText> partialResult, List<UserInfo> userInfos) {
+			foreach (UserInfoClearText matchedUserInfo in partialResult) {
+				userInfos.Remove(userInfos.Where(userInfo => userInfo.Username == matchedUserInfo.Username).First());
+			}
+			return userInfos;
 		}
 
 		/// <summary>
