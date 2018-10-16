@@ -23,6 +23,16 @@ namespace CrackerClient.Utils {
 			return strFirstLetterUppsecase + strRest;
 		}
 
+
+		public static string CapitaliseToIndex(string str, int index) {
+			if (str == null) throw new ArgumentNullException("str");
+			if (str.Trim().Length == 0) return str;
+
+			string strFirstLetterUppsecase = str.Substring(0, index).ToUpper();
+			string strRest = str.Substring(index);
+			return strFirstLetterUppsecase + strRest;
+		}
+
 		/// <summary>
 		/// Reverses a string.
 		/// </summary>
